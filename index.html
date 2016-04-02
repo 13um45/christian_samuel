@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="animate.min.css">
   </head>
   <body>
+  <a name="home"></a>
     <div class="site-pusher">
       <div class="row">
         <header class="header">
@@ -25,7 +26,6 @@
         </header>
       </div>
       <div class="container">
-        <a name="home"></a>
         <div class="name_space"></div>
         <div class="name_row">
           <div class="col-12">
@@ -51,7 +51,7 @@
         <div class="about_container">
           <div class="vertical_center">
             <div class="row">
-              <h1 class="txt_center title">
+              <h1 class="txt_center title reveal">
                 About
               </h1>
             </div>
@@ -59,6 +59,17 @@
               <p class="info txt_center">
                 I have a strong interest in technology and creativity. At the moment I am pursuing a career in web development. I have experience with Ruby, Ruby on Rails, HTML5, CSS3, JavaScript, jQuery, PostgreSQL, and Agile methodologies. My hobbies include photography, music creation and tinkering with various electronic devices.
               </p>
+            </div>
+            <div class="row">
+              <div class="icon_container reveal_seq">
+                <i class="icon-html icons reveal_seq"></i>
+                <i class="icon-css icons reveal_seq"></i>
+                <i class="icon-javascript icons reveal_seq"></i>
+                <i class="icon-ruby icons reveal_seq"></i>
+                <i class="icon-ruby-on-rails icons reveal_seq"></i>
+                <i class="icon-heroku icons reveal_seq"></i>
+                <i class="icon-postgres icons reveal_seq"></i>
+              </div>
             </div>
           </div>
         </div>
@@ -68,9 +79,26 @@
         <a name="projects"></a>
         <div class="projects_container">
           <div class="row">
-            <h1 class="title txt_center">
+            <h1 class="title txt_center reveal">
               Projects
             </h1>
+          </div>
+          <div class="row">
+            <div class="img_col">
+              <a href="https://tekestore.herokuapp.com/" target="_blank">
+                <img src="teke.png" class="hvr-glow">
+              </a>
+            </div>
+            <div class="img_col">
+              <a href="http://www.slangish.org/" target="_blank">
+                <img src="slangish.png" class="hvr-glow">
+              </a>
+            </div>
+            <div class="img_col">
+              <a href="http://www.youme3d.co/" target="_blank">
+                <img src="youme3d.png" class="hvr-glow">
+              </a>
+            </div>
           </div>
         </div>
         <div class="small_space"></div>
@@ -78,16 +106,34 @@
       <div class="full_container_white">
         <a name="contact"></a>
         <div class="contact_container">
-          <div class="vertical_center">
+        <div class="small_space"></div>
             <div class="row">
-              <h1 class="title txt_center">
+              <h1 class="title txt_center reveal">
                 Contact
               </h1>
               <div class="row">
-                <a href="mailto:christian.leumas@icloud.com"><h2 class="txt_center">Email</h2></a>
+                <div class="col-4">
+                  <a href="https://github.com/13um45">
+                    <i class="fa fa-github icons reveal_seq_2"></i>
+                  </a>
+                </div>
+                <div class="col-4">
+                  <a href="https://twitter.com/christianleumas">
+                    <i class="fa fa-twitter icons reveal_seq_2"></i>
+                  </a>
+                </div>
+                <div class="col-4">
+                  <a href="https://www.linkedin.com/in/christian-samuel-116334106
+">
+                    <i class="fa fa-linkedin icons reveal_seq_2"></i>
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
+            <div class="row">
+                <a href="mailto:christian.leumas@icloud.com"><h2 class="txt_center">Email</h2></a>
+              </div>
+            <div class="small_space"></div>
         </div>
       </div>
       <div class="site-cache" id="site-cache"></div>
@@ -105,5 +151,7 @@
     <script src="js/ShaderPass.js"></script>
     <script src="js/background.js"></script>
     <script src="js/smooth_scroll.js"></script>
+    <script src="https://cdn.jsdelivr.net/scrollreveal.js/3.1.2/scrollreveal.min.js"></script>
+    <script src="js/reveal.js"></script>
   </body>
 </html>`

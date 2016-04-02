@@ -11,6 +11,10 @@ $(document).ready(function(){
       $('body').removeClass('with--sidebar');
     });
 
+    $('.menu a').click(function(e){
+      $('body').removeClass('with--sidebar');
+    });
+
   })(jQuery);
 
 });

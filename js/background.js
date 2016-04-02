@@ -57,7 +57,7 @@
         composer.addPass( effect );
 
         var effect = new THREE.ShaderPass( THREE.RGBShiftShader );
-        effect.uniforms[ 'amount' ].value = 0.005;
+        effect.uniforms[ 'amount' ].value = 0.35;
         effect.renderToScreen = true;
         composer.addPass( effect );
 

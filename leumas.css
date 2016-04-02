@@ -13,8 +13,12 @@ canvas {
   height: 100%;
   position: absolute;
   top: 0;
-  left: 0;
+  left: -15px;
   z-index: -9999;
+}
+
+img {
+  width: 100%
 }
 
 a {
@@ -26,11 +30,24 @@ a:hover {
   color: #92CDCF;
 }
 
+.reveal {
+  visibility: hidden;
+}
+
+.reveal_seq {
+  visibility: hidden;
+}
+
 .container {
   width: 100%;
   margin: 0 auto;
   max-width: 1200px;
   box-sizing: border-box;
+}
+
+.icon_container {
+  margin: auto;
+  max-width: 364px;
 }
 
 .full_container_white {
@@ -61,7 +78,7 @@ a:hover {
 
 .projects_container {
   width: 100%;
-  height: 100px;
+  height: 350px;
   margin: 0 auto;
   max-width: 1200px;
   box-sizing: border-box;
@@ -71,9 +88,13 @@ a:hover {
   width: 100%;
   height: 500px;
   margin: 0 auto;
-  max-width: 1200px;
-  display: flex;
-  justify-content: center;
+  max-width: 200px;
+  box-sizing: border-box;
+}
+
+.img_col {
+  float: left;
+  padding: 20px;
   box-sizing: border-box;
 }
 
@@ -215,7 +236,7 @@ a:hover {
 }
 
 .icons {
-  font-size: 3em !important;
+  font-size: 48px !important;
   color: #000000;
 }
 
@@ -242,7 +263,7 @@ a:hover {
     height: auto;
     float: right;
     padding: 10px;
-    padding-right: 25px;
+
 }
 
 .first_nav {
@@ -273,6 +294,14 @@ button.btn:hover {
   .name_space {
     height: 50px;
   }
+
+  .img_col {
+  float: left;
+  width: 33.33333333%;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
 }
 
 /* screens smaller than 768px see this*/
@@ -312,9 +341,7 @@ button.btn:hover {
     -webkit-overflow-scrolling: touch;
   }
 
-  .header {
-    position: static;
-  }
+
 
   .header__icon {
     position: relative;
@@ -370,6 +397,24 @@ button.btn:hover {
 
   .arrow {
     font-size: 25px !important;
+  }
+
+  .projects_container {
+    width: 100%;
+    height: 800px;
+    margin: 0 auto;
+    max-width: 1200px;
+    box-sizing: border-box;
+  }
+}
+
+@media only screen and (max-width: 364px) {
+  .icon_container {
+    margin: auto;
+    padding: 20px;
+  }
+  .icons {
+    font-size: 34px !important;
   }
 }
 
@@ -500,5 +545,23 @@ button.btn:hover {
   .small_space {
     height: 125px;
   }
+}
+
+.hvr-glow {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: box-shadow;
+  transition-property: box-shadow;
+}
+.hvr-glow:hover, .hvr-glow:focus, .hvr-glow:active {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
 

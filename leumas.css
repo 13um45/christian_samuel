@@ -56,6 +56,13 @@ a:hover {
   box-sizing: border-box;
 }
 
+.full_container_black {
+  width: 100%;
+  background-color: black;
+  box-sizing: border-box;
+}
+
+
 .full_container_cloud {
   width: 100%;
   background-color: #ecf0f1;
@@ -67,8 +74,6 @@ a:hover {
   height: 600px;
   margin: 0 auto;
   max-width: 700px;
-  display: flex;
-  justify-content: center;
   box-sizing: border-box;
 }
 
@@ -176,9 +181,55 @@ a:hover {
   box-sizing: border-box;
 }
 
+
+.col-off-1 {
+  margin-left: 8.333%;
+}
+
+.col-off-2 {
+  margin-left: 16.667%;
+}
+
+.col-off-3 {
+  margin-left: 25%;
+}
+
+.col-off-4 {
+  margin-left: 33.333%;
+}
+
+.col-off-5 {
+  margin-left: 41.667%;
+}
+
+.col-off-6 {
+  margin-left: 50%;
+}
+
+.col-off-7 {
+  margin-left: 58.333%;
+}
+
+.col-off-8 {
+  margin-left: 66.667%;
+}
+
+.col-off-9 {
+  margin-left: 75%;
+}
+
+.col-off-10 {
+  margin-left: 83.333%;
+}
+
+.col-off-11 {
+  margin-left: 91.667%;
+}
+
 .site-content {
   padding-top: 66px;
 }
+
 
 .header {
   position: fixed;
@@ -224,6 +275,12 @@ a:hover {
 .title {
   font-weight: 100;
   font-size: 30px;
+  margin-bottom: 0px;
+}
+
+.subtitle {
+  font-weight: 100;
+  font-size: 15px;
 }
 
 .info {
@@ -240,8 +297,12 @@ a:hover {
   color: #000000;
 }
 
+.white {
+  color: white !important;
+}
+
 .arrow {
-  font-size: 35px !important;
+  font-size: 25px !important;
   color: #000000;
 }
 
@@ -284,6 +345,10 @@ button.btn:hover {
   background: #fff;
 }
 
+#trigger {
+  position: absolute;
+  top: 780px;
+}
 
 /*screen bigger than 768px see this*/
 
@@ -292,7 +357,7 @@ button.btn:hover {
     margin-bottom: 20px;
   }
   .name_space {
-    height: 50px;
+    height: 30px;
   }
 
   .img_col {
@@ -396,7 +461,7 @@ button.btn:hover {
   }
 
   .arrow {
-    font-size: 25px !important;
+    font-size: 20px !important;
   }
 
   .projects_container {

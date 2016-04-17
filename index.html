@@ -12,7 +12,7 @@
   <body>
   <a name="home"></a>
     <div class="site-pusher">
-      <div class="row">
+      <div class="row" id="foo">
         <header class="header">
           <a href="#" class="header__icon" id="header__icon"></a>
      <!--      <a href="#" class="header__logo">Christian Samuel</a> -->
@@ -33,6 +33,9 @@
               Christian Samuel
             </h1>
           </div>
+          <div class="subtitle">
+              <p class="txt_center ">Web Developer</p>
+          </div>
         </div>
 
         <div class="big_space"></div>
@@ -45,36 +48,45 @@
         </div>
         <div class="small_space"></div>
       </div>
-      <div class="full_container_white">
+      <div class="full_container_white panel">
         <div class="hr"></div>
         <a name="about"></a>
         <div class="about_container">
-          <div class="vertical_center">
-            <div class="row">
-              <h1 class="txt_center title reveal">
-                About
-              </h1>
+          <div class="row">
+            <h1 class="txt_center title reveal">
+              About
+            </h1>
+          </div>
+          <div class="row">
+            <div class="col-4 col-off-4">
+            <div id="trigger"></div>
+            <div id="imagesequence">
+              <img id="myimg" src="portrait.jpg"><br>
             </div>
-            <div class="row">
-              <p class="info txt_center">
-                I have a strong interest in technology and creativity. At the moment I am pursuing a career in web development. I have experience with Ruby, Ruby on Rails, HTML5, CSS3, JavaScript, jQuery, PostgreSQL, and Agile methodologies. My hobbies include photography, music creation and tinkering with various electronic devices.
-              </p>
+            <div class="spacer s2"></div>
             </div>
-            <div class="row">
-              <div class="icon_container reveal_seq">
-                <i class="icon-html icons reveal_seq"></i>
-                <i class="icon-css icons reveal_seq"></i>
-                <i class="icon-javascript icons reveal_seq"></i>
-                <i class="icon-ruby icons reveal_seq"></i>
-                <i class="icon-ruby-on-rails icons reveal_seq"></i>
-                <i class="icon-heroku icons reveal_seq"></i>
-                <i class="icon-postgres icons reveal_seq"></i>
-              </div>
+          </div>
+
+          <div class="row">
+            <p class="info txt_center ">
+              I have a strong interest in technology and creativity. At the moment I am pursuing a career in web development. I have experience with Ruby, Ruby on Rails, HTML5, CSS3, JavaScript, jQuery, PostgreSQL, and Agile methodologies. My hobbies include photography, music creation and tinkering with various electronic devices.
+            </p>
+              <!-- <div id="trigger"></div> -->
+          </div>
+          <div class="row">
+            <div class="icon_container reveal_seq ">
+              <i class="icon-html icons reveal_seq "></i>
+              <i class="icon-css icons reveal_seq "></i>
+              <i class="icon-javascript icons reveal_seq "></i>
+              <i class="icon-ruby icons reveal_seq "></i>
+              <i class="icon-ruby-on-rails icons reveal_seq "></i>
+              <i class="icon-heroku icons reveal_seq "></i>
+              <i class="icon-postgres icons reveal_seq  "></i>
             </div>
           </div>
         </div>
       </div>
-      <div class="full_container_cloud">
+      <div class="full_container_cloud panel">
         <div class="small_space"></div>
         <a name="projects"></a>
         <div class="projects_container">
@@ -86,24 +98,24 @@
           <div class="row">
             <div class="img_col">
               <a href="https://tekestore.herokuapp.com/" target="_blank">
-                <img src="teke.png" class="hvr-glow">
+                <img src="teke.png" class="">
               </a>
             </div>
             <div class="img_col">
               <a href="http://www.slangish.org/" target="_blank">
-                <img src="slangish.png" class="hvr-glow">
+                <img src="slangish.png" class="">
               </a>
             </div>
             <div class="img_col">
               <a href="http://www.youme3d.co/" target="_blank">
-                <img src="youme3d.png" class="hvr-glow">
+                <img src="youme3d.png" class="">
               </a>
             </div>
           </div>
         </div>
         <div class="small_space"></div>
       </div>
-      <div class="full_container_white">
+      <div class="full_container_white panel">
         <a name="contact"></a>
         <div class="contact_container">
         <div class="small_space"></div>
@@ -123,8 +135,7 @@
                   </a>
                 </div>
                 <div class="col-4">
-                  <a href="https://www.linkedin.com/in/christian-samuel-116334106
-">
+                  <a href="https://www.linkedin.com/in/christian-samuel-116334106">
                     <i class="fa fa-linkedin icons reveal_seq_2"></i>
                   </a>
                 </div>
@@ -153,5 +164,13 @@
     <script src="js/smooth_scroll.js"></script>
     <script src="https://cdn.jsdelivr.net/scrollreveal.js/3.1.2/scrollreveal.min.js"></script>
     <script src="js/reveal.js"></script>
-  </body>
+<!--     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/TweenMax.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.0/velocity.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.2/ScrollMagic.min.js"></script>
+    <script src="js/debug.js"></script>
+    <script src="js/velocity.js"></script>
+    <script src="js/s_magic.js"></script>
+    <script src="js/animation.gsap.js"></script>
+    <script src="js/motion.js"></script>
+  </body> -->
 </html>`

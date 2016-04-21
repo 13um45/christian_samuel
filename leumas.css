@@ -30,6 +30,7 @@ a:hover {
   color: #92CDCF;
 }
 
+
 .reveal {
   visibility: hidden;
 }
@@ -71,9 +72,9 @@ a:hover {
 
 .tech_container {
   width: 100%;
-  height: 550px;
+  height: 680px;
   margin: 0 auto;
-  max-width: 700px;
+  max-width: 1000px;
   box-sizing: border-box;
 }
 
@@ -81,20 +82,16 @@ a:hover {
   align-self: center;
 }
 
-.projects_container {
-  width: 100%;
-  height: 350px;
-  margin: 0 auto;
-  max-width: 1200px;
-  box-sizing: border-box;
+.projects {
+  height: 680px;
 }
 
-.contact_container {
-  width: 100%;
+.about {
+  height: 800px;
+}
+
+.contact {
   height: 500px;
-  margin: 0 auto;
-  max-width: 200px;
-  box-sizing: border-box;
 }
 
 .img_col {
@@ -111,7 +108,7 @@ a:hover {
 .icon_row {
   border: #9b59b6;
   overflow: hidden;
-  margin-bottom: 50px;
+  margin-bottom: 80px;
 }
 .col-12 {
   float: left;
@@ -273,21 +270,18 @@ a:hover {
   margin-bottom: 0px;
 }
 
-.name_space {
-  height: 0px;
-}
-
 .name {
   font-weight: 100;
   font-size: 30px;
+  margin-top: 30px;
   margin-bottom: 0px;
 }
 
 .title {
   font-weight: 100;
   font-size: 30px;
-  margin-top: 100px;
-  margin-bottom: 70px;
+  margin-top: 120px;
+  margin-bottom: 90px;
 }
 
 .subtitle {
@@ -305,8 +299,14 @@ a:hover {
 }
 
 .icons {
-  font-size: 48px !important;
+  font-size: 65px !important;
   color: #000000;
+}
+
+.c_icons {
+  font-size: 20px !important;
+  color: #000000;
+  padding-right: 10px;
 }
 
 .white {
@@ -329,14 +329,6 @@ a:hover {
      background: #FFFFFF;
      width: 100%;
      height: 3px;
-}
-
-.nav_icon {
-    width: 40px;
-    height: auto;
-    float: right;
-    padding: 10px;
-
 }
 
 .first_nav {
@@ -368,8 +360,8 @@ button.btn:hover {
   .name_row {
     margin-bottom: 20px;
   }
-  .name_space {
-    height: 30px;
+  .name {
+    margin-top: 60px;
   }
 
   .img_col {
@@ -387,9 +379,6 @@ button.btn:hover {
   .site-pusher,
   .site-container {
     height: 100%;
-  }
-  .nav_icon {
-    display: none;
   }
 
   .first_nav {
@@ -476,12 +465,8 @@ button.btn:hover {
     font-size: 20px !important;
   }
 
-  .projects_container {
-    width: 100%;
+  .projects{
     height: 800px;
-    margin: 0 auto;
-    max-width: 1200px;
-    box-sizing: border-box;
   }
 }
 

@@ -23,6 +23,10 @@ img {
 a {
   text-decoration: none;
   color: #000000;
+  -webkit-transition: color .5s;
+  -moz-transition: color .5s;
+  -o-transition: color .5s;
+  transition: color .5s;
 }
 
 a:hover {
@@ -134,7 +138,7 @@ a:hover {
 }
 
 .menu a:hover {
-  color: #92CDCF;
+  color: #92CDCF !important;
 }
 
 .txt_center {
@@ -183,6 +187,14 @@ a:hover {
   font-size: 20px !important;
   color: #000000;
   padding-right: 10px;
+  -webkit-transition: color .5s;
+  -moz-transition: color .5s;
+  -o-transition: color .5s;
+  transition: color .5s;
+}
+
+.c_icons:hover {
+  color: #92CDCF;
 }
 
 .white {

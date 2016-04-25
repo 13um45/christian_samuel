@@ -4,5 +4,5 @@
   // build scene
   var scene = new ScrollMagic.Scene({triggerElement: "#trigger"})
           // trigger a velocity opaticy animation
-          .setVelocity("#foo", {opacity: 0}, {duration: 400})
+          .setVelocity("#foo", {color: "#F0FFFF"}, {duration: 400})
           .addTo(controller);

@@ -76,10 +76,6 @@ a:hover {
   box-sizing: border-box;
 }
 
-.projects {
-  height: 680px;
-}
-
 .about {
   height: 1000px;
 }
@@ -715,7 +711,7 @@ a:hover {
 
 @media only screen and (max-width: 364px) {
   .icon_container {
-    margin: auto;
+    margin: aut o;
     padding: 20px;
   }
   .icons {

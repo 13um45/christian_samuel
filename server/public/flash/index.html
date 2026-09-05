@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Flash utility</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --fg: #1a1a18; --muted: #6b6b66;
+    --line: #dcdcd6; --card: #ffffff; --accent: #c2410c; --ok: #15803d; --err: #b91c1c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161a; --fg: #ececea; --muted: #9a9a94;
+      --line: #2e2e34; --card: #1e1e23; --accent: #fb923c; --ok: #4ade80; --err: #f87171;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 2.5rem 1.25rem; background: var(--bg); color: var(--fg);
+    font: 16px/1.6 ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  main { max-width: 34rem; margin: 0 auto; }
+  h1 { font-size: 1.6rem; letter-spacing: -0.02em; margin: 0 0 .25rem; }
+  .sub { color: var(--muted); margin: 0 0 2rem; }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 1.25rem 1.4rem; margin-bottom: 1.25rem;
+  }
+  ol { margin: 0; padding-left: 1.2rem; }
+  ol li { margin-bottom: .4rem; }
+  button {
+    width: 100%; padding: .85rem 1rem; font-size: 1rem; font-weight: 600;
+    color: #fff; background: var(--accent); border: 0; border-radius: 9px; cursor: pointer;
+  }
+  button:disabled { opacity: .55; cursor: progress; }
+  progress { width: 100%; height: .5rem; margin-top: .9rem; }
+  .status { margin-top: .9rem; min-height: 1.5rem; color: var(--muted); font-size: .93rem; }
+  .status--ok { color: var(--ok); font-weight: 600; }
+  .status--error { color: var(--err); font-weight: 600; }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: .3rem 1rem; margin: 0; font-size: .9rem; }
+  dt { color: var(--muted); }
+  dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .notice { border-left: 3px solid var(--accent); }
+  footer { color: var(--muted); font-size: .82rem; margin-top: 2rem; }
+  a { color: inherit; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Flash utility</h1>
+  <p class="sub">Update your pedal's firmware from the browser.</p>
+
+  <div class="card notice" id="unsupported" hidden>
+    <strong>This browser can't flash.</strong>
+    <p style="margin:.5rem 0 0">
+      Flashing uses WebUSB, which only Chromium-based desktop browsers support —
+      Chrome, Edge, Opera or Arc on macOS, Windows or Linux. Firefox, Safari and
+      every browser on iOS or Android will not work. Open this page in one of those
+      instead.
+    </p>
+  </div>
+
+  <div id="app" hidden>
+    <div class="card">
+      <ol>
+        <li>Plug the pedal into this computer with USB.</li>
+        <li>Put it into DFU mode, then press <strong>Flash</strong> below.</li>
+        <li>Pick the Daisy device in the browser prompt.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <button id="flash">Flash utility</button>
+      <progress id="progress" hidden></progress>
+      <div class="status" id="status">Ready.</div>
+    </div>
+
+    <div class="card" id="release-info" hidden>
+      <dl>
+        <dt>Version</dt><dd id="version">—</dd>
+        <dt>Size</dt><dd id="size">—</dd>
+        <dt>Source</dt><dd><a id="source" href="#">—</a></dd>
+      </dl>
+    </div>
+  </div>
+
+  <footer>
+    utility is MIT licensed. The firmware image statically links
+    <code>ReverbSc</code> from DaisySP-LGPL under the LGPL-3.0; the corresponding
+    source for the build above is the linked tag.
+  </footer>
+</main>
+
+<script src="dfu.js"></script>
+<script src="dfuse.js"></script>
+<script src="flasher.js"></script>
+</body>
+</html>

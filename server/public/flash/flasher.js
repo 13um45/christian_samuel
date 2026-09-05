@@ -71,10 +71,13 @@ async function connect() {
   let chosen = interfaces.find((i) => interfaceHoldsAddress(i, QSPI_APP_ADDRESS));
   if (!chosen) {
     const names = interfaces.map((i) => i.name || '(unnamed)').join(', ');
+    // Both the Daisy bootloader and the STM32 ROM bootloader enumerate as
+    // 0483:df11, so VID/PID cannot tell them apart — only the memory map can.
+    // Landing here almost always means BOOT was held down at reset, which
+    // starts the ROM bootloader (internal flash only).
     throw new Error(
-      'No DFU interface covers 0x' + QSPI_APP_ADDRESS.toString(16) + '. Saw: ' + names +
-      '. That usually means the board is in the STM32 ROM bootloader (internal flash only) ' +
-      'rather than the Daisy bootloader.'
+      'This device is not offering the QSPI region the firmware needs. Press RESET on ' +
+      'its own — without holding BOOT — and try again. (Saw: ' + names + ')'
     );
   }
 

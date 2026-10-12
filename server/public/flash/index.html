@@ -45,6 +45,17 @@
   .picker-help ol { margin: .55rem 0 .55rem; padding-left: 1.2rem; }
   .picker-help li { margin-bottom: .3rem; }
   .picker-help p { margin: 0; color: var(--muted); }
+  .chan { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .chan__opt {
+    display: flex; flex-direction: column; gap: .15rem; align-items: flex-start;
+    width: 100%; padding: .65rem .8rem; cursor: pointer; text-align: left;
+    background: transparent; color: var(--fg);
+    border: 1px solid var(--line); border-radius: 9px; font: inherit;
+  }
+  .chan__opt[aria-checked="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .chan__opt[disabled] { opacity: .4; cursor: not-allowed; }
+  .chan__name { font-weight: 600; font-size: .95rem; }
+  .chan__sub { font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   .device { margin-top: .9rem; font-size: .9rem; color: var(--muted); }
   .device::before { content: "\25CF"; margin-right: .45rem; opacity: .5; }
   .device--ok { color: var(--ok); font-weight: 600; }
@@ -95,6 +106,19 @@
       </p>
     </div>
 
+    <div class="card" id="channels" hidden>
+      <div class="chan" role="radiogroup" aria-label="Firmware channel">
+        <button type="button" class="chan__opt" data-channel="stable" role="radio" aria-checked="false">
+          <span class="chan__name">Stable</span>
+          <span class="chan__sub" id="chan-stable-sub">—</span>
+        </button>
+        <button type="button" class="chan__opt" data-channel="latest" role="radio" aria-checked="false">
+          <span class="chan__name">Latest</span>
+          <span class="chan__sub" id="chan-latest-sub">—</span>
+        </button>
+      </div>
+    </div>
+
     <div class="card">
       <button id="flash">Open connection window</button>
       <div class="picker-help" id="picker-help" hidden>
@@ -117,6 +141,7 @@
       <dl>
         <dt>Version</dt><dd id="version">—</dd>
         <dt>Size</dt><dd id="size">—</dd>
+        <dt>Built</dt><dd id="built">—</dd>
         <dt>Source</dt><dd><a id="source" href="#">—</a></dd>
       </dl>
     </div>

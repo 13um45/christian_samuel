@@ -36,7 +36,9 @@ end
 
 GATED = ['/flash', '/flash/', '/flash/index.html', '/flash/flasher.js',
          '/flash/dfu.js', '/flash/dfuse.js', '/flash/release.json',
-         '/flash/firmware.bin'].freeze
+         '/flash/channels.json', '/flash/firmware.bin',
+         '/flash/release.json?channel=latest',
+         '/flash/firmware.bin?channel=latest'].freeze
 
 puts 'unauthenticated requests are refused:'
 GATED.each { |p| check(p, REQ.get(p).status, 401) }

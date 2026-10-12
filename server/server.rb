@@ -12,7 +12,8 @@ FIRMWARE_REPO = ENV.fetch('FIRMWARE_REPO', '13um45/utility')
 # first request after a deploy simply repopulates it.
 CACHE_LOCK = Mutex.new
 RELEASE_TTL = 60
-CACHE = { release: nil, release_at: nil, tag: nil, bin: nil }
+CHANNELS = %w[stable latest].freeze
+CACHE = Hash.new { |h, k| h[k] = { release: nil, release_at: nil, tag: nil, bin: nil } }
 
 # Pinned rather than inferred. Sinatra derives its root from the call stack,
 # which Ruby 4.0's require shim perturbs — the app then resolves public_folder
@@ -94,35 +95,54 @@ end
 # can never reach the GitHub API itself — the token stays here.
 get '/flash/release.json' do
   content_type :json
-  release = latest_release
-  return halt(502, { error: release[:error] }.to_json) if release[:error]
+  channel = channel_from(params)
+  release = latest_release(channel)
+  return halt(502, { error: release[:error], channel: channel }.to_json) if release[:error]
+
+  # Stable points at its tag; the rolling tag moves, so that one points at the
+  # commit, which is the only immutable identifier it has.
+  ref = channel == 'latest' ? (release[:commit] || release[:tag]) : release[:tag]
 
   {
+    channel: channel,
     tag: release[:tag],
+    ref: ref,
     published_at: release[:published_at],
     size: release[:size],
-    source_url: "https://github.com/#{FIRMWARE_REPO}/tree/#{release[:tag]}",
+    source_url: "https://github.com/#{FIRMWARE_REPO}/tree/#{ref}",
     sha256: release[:sha256]
   }.to_json
+end
+
+# Which channels actually have a build, so the page can hide a dead option
+# rather than offering one that 502s.
+get '/flash/channels.json' do
+  content_type :json
+  available = CHANNELS.select { |c| !latest_release(c)[:error] }
+  { available: available, default: available.include?('stable') ? 'stable' : available.first }.to_json
 end
 
 # Streams the firmware itself. Behind the same gate as everything else under
 # /flash, so an unauthenticated visitor cannot pull the binary directly.
 get '/flash/firmware.bin' do
-  release = latest_release
+  channel = channel_from(params)
+  release = latest_release(channel)
   halt(502, release[:error].to_s) if release[:error]
-  halt(502, 'No utility.bin on the latest release.') unless release[:asset_url]
+  halt(502, 'No utility.bin on that release.') unless release[:asset_url]
 
-  tag = release[:tag]
-  cached = CACHE_LOCK.synchronize { CACHE[:tag] == tag ? CACHE[:bin] : nil }
+  slot = CACHE[channel]
+  # Keyed on the checksum, not the tag: the rolling tag stays 'latest' while
+  # its contents change, so a tag key would serve a stale binary forever.
+  key = release[:sha256] || release[:tag]
+  cached = CACHE_LOCK.synchronize { slot[:tag] == key ? slot[:bin] : nil }
 
   body = cached || gh_get(release[:asset_url], accept: 'application/octet-stream')
   halt(502, 'Could not download firmware from GitHub.') unless body
 
   unless cached
     CACHE_LOCK.synchronize do
-      CACHE[:tag] = tag
-      CACHE[:bin] = body
+      slot[:tag] = key
+      slot[:bin] = body
     end
   end
 
@@ -181,17 +201,30 @@ def gh_get_unauthenticated(url, limit: 5)
   res.is_a?(Net::HTTPSuccess) ? res.body : nil
 end
 
-def latest_release
+def channel_from(params)
+  c = params['channel'].to_s
+  CHANNELS.include?(c) ? c : 'stable'
+end
+
+# stable resolves through /releases/latest, which skips prereleases; the
+# rolling build is a prerelease, so it has to be fetched by its tag.
+def release_endpoint(channel)
+  base = "https://api.github.com/repos/#{FIRMWARE_REPO}/releases"
+  channel == 'latest' ? "#{base}/tags/latest" : "#{base}/latest"
+end
+
+def latest_release(channel = 'stable')
   return { error: 'FIRMWARE_TOKEN is unset; cannot read the private firmware repo.' } unless gh_token
 
+  slot = CACHE[channel]
   cached = CACHE_LOCK.synchronize do
-    fresh = CACHE[:release_at] && (Time.now - CACHE[:release_at]) < RELEASE_TTL
-    fresh ? CACHE[:release] : nil
+    fresh = slot[:release_at] && (Time.now - slot[:release_at]) < RELEASE_TTL
+    fresh ? slot[:release] : nil
   end
   return cached if cached
 
-  raw = gh_get("https://api.github.com/repos/#{FIRMWARE_REPO}/releases/latest")
-  return { error: 'GitHub did not return a latest release.' } unless raw
+  raw = gh_get(release_endpoint(channel))
+  return { error: "No #{channel} release published yet." } unless raw
 
   data = JSON.parse(raw)
   bin = (data['assets'] || []).find { |a| a['name'] == 'utility.bin' }
@@ -207,11 +240,15 @@ def latest_release
     published_at: data['published_at'],
     size: bin && bin['size'],
     asset_url: bin && bin['url'],
-    sha256: sha
+    sha256: sha,
+    channel: channel,
+    # The rolling tag moves, so it names no source tree. target_commitish is
+    # the commit this build came from and is what the page must link.
+    commit: data['target_commitish']
   }
   CACHE_LOCK.synchronize do
-    CACHE[:release] = result
-    CACHE[:release_at] = Time.now
+    slot[:release] = result
+    slot[:release_at] = Time.now
   end
   result
 rescue JSON::ParserError

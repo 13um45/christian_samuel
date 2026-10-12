@@ -9,7 +9,7 @@ const DAISY_VENDOR_ID = 0x0483;
 const TRANSFER_SIZE = 1024;
 
 const el = (id) => document.getElementById(id);
-const state = { device: null, firmware: null, release: null, prefetch: null, devicePresent: false, authorised: false };
+const state = { device: null, firmware: null, release: null, prefetch: null, devicePresent: false, authorised: false, channel: 'stable' };
 
 function setStatus(msg, kind) {
   const node = el('status');
@@ -108,16 +108,73 @@ async function connect(preauthorised) {
   return device;
 }
 
-async function loadRelease() {
-  const res = await fetch('/flash/release.json', { credentials: 'same-origin' });
+async function loadRelease(channel) {
+  const res = await fetch('/flash/release.json?channel=' + encodeURIComponent(channel), { credentials: 'same-origin' });
   if (!res.ok) throw new Error('Could not read release info (' + res.status + ').');
   return res.json();
 }
 
-async function loadFirmware() {
-  const res = await fetch('/flash/firmware.bin', { credentials: 'same-origin' });
+async function loadFirmware(channel) {
+  const res = await fetch('/flash/firmware.bin?channel=' + encodeURIComponent(channel), { credentials: 'same-origin' });
   if (!res.ok) throw new Error('Could not download firmware (' + res.status + ').');
   return res.arrayBuffer();
+}
+
+function ago(iso) {
+  if (!iso) return '—';
+  const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (mins < 60) return mins + ' min ago';
+  const hrs = Math.round(mins / 60);
+  if (hrs < 48) return hrs + ' h ago';
+  return Math.round(hrs / 24) + ' days ago';
+}
+
+// Switching channel invalidates the prefetched image — it belongs to the other
+// build. Re-fetching here keeps the picker instant after a switch.
+async function selectChannel(channel) {
+  state.channel = channel;
+  document.querySelectorAll('.chan__opt').forEach((b) => {
+    b.setAttribute('aria-checked', String(b.dataset.channel === channel));
+  });
+  state.firmware = null;
+  state.prefetch = null;
+  try {
+    state.release = await loadRelease(channel);
+    el('version').textContent = state.release.tag;
+    el('size').textContent = state.release.size ? (state.release.size + ' bytes') : '—';
+    el('built').textContent = ago(state.release.published_at);
+    const link = el('source');
+    link.href = state.release.source_url;
+    link.textContent = (state.release.ref || '').slice(0, 7) || state.release.tag;
+    el('release-info').hidden = false;
+    const sub = el('chan-' + channel + '-sub');
+    if (sub) sub.textContent = state.release.tag;
+    state.prefetch = loadFirmware(channel);
+    state.prefetch
+      .then(() => setStatus('Firmware ready. Open the connection window to begin.'))
+      .catch((e) => setStatus('Could not pre-load firmware: ' + e.message, 'error'));
+  } catch (err) {
+    setStatus('Could not reach the ' + channel + ' release: ' + err.message, 'error');
+  }
+}
+
+async function setUpChannels() {
+  let info;
+  try {
+    const res = await fetch('/flash/channels.json', { credentials: 'same-origin' });
+    info = await res.json();
+  } catch (e) {
+    info = { available: ['stable'], default: 'stable' };
+  }
+  const available = info.available || [];
+  document.querySelectorAll('.chan__opt').forEach((b) => {
+    const ok = available.includes(b.dataset.channel);
+    b.disabled = !ok;
+    b.addEventListener('click', () => { if (!b.disabled) selectChannel(b.dataset.channel); });
+  });
+  // Only worth showing the choice when there is a choice.
+  if (available.length > 1) el('channels').hidden = false;
+  return info.default || available[0] || 'stable';
 }
 
 async function sha256Hex(buffer) {
@@ -132,7 +189,7 @@ async function flash() {
     // The DFU window is ~2s wide, so nothing slow may sit between the click
     // and the device picker. The download was started at page load; by now it
     // is almost always already resolved.
-    if (!state.prefetch) state.prefetch = loadFirmware();
+    if (!state.prefetch) state.prefetch = loadFirmware(state.channel);
     setStatus('Preparing…');
     state.firmware = await state.prefetch;
 
@@ -250,22 +307,8 @@ async function init() {
   el('flash').addEventListener('click', onPrimary);
   watchForDevice();
 
-  try {
-    state.release = await loadRelease();
-    el('version').textContent = state.release.tag;
-    el('size').textContent = state.release.size ? (state.release.size + ' bytes') : '—';
-    const link = el('source');
-    link.href = state.release.source_url;
-    link.textContent = state.release.tag;
-    el('release-info').hidden = false;
-
-    state.prefetch = loadFirmware();
-    state.prefetch
-      .then(() => setStatus('Firmware ready. Open the connection window to begin.'))
-      .catch((e) => setStatus('Could not pre-load firmware: ' + e.message, 'error'));
-  } catch (err) {
-    setStatus('Could not reach the firmware release: ' + err.message, 'error');
-  }
+  const initial = await setUpChannels();
+  await selectChannel(initial);
 }
 
 document.addEventListener('DOMContentLoaded', init);

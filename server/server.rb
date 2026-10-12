@@ -5,6 +5,15 @@ require 'uri'
 
 FIRMWARE_REPO = ENV.fetch('FIRMWARE_REPO', '13um45/utility')
 
+# The release is the single source of truth, but re-fetching ~280 KB from
+# GitHub on every page load is wasteful and slow. Metadata is re-checked once a
+# minute; the image itself is held per tag, so a new release replaces it and an
+# unchanged one is served from memory. Lost on restart, which is fine — the
+# first request after a deploy simply repopulates it.
+CACHE_LOCK = Mutex.new
+RELEASE_TTL = 60
+CACHE = { release: nil, release_at: nil, tag: nil, bin: nil }
+
 # Pinned rather than inferred. Sinatra derives its root from the call stack,
 # which Ruby 4.0's require shim perturbs — the app then resolves public_folder
 # under the Ruby install and 404s every static asset. Explicit here so the site
@@ -104,11 +113,26 @@ get '/flash/firmware.bin' do
   halt(502, release[:error].to_s) if release[:error]
   halt(502, 'No utility.bin on the latest release.') unless release[:asset_url]
 
-  body = gh_get(release[:asset_url], accept: 'application/octet-stream')
+  tag = release[:tag]
+  cached = CACHE_LOCK.synchronize { CACHE[:tag] == tag ? CACHE[:bin] : nil }
+
+  body = cached || gh_get(release[:asset_url], accept: 'application/octet-stream')
   halt(502, 'Could not download firmware from GitHub.') unless body
+
+  unless cached
+    CACHE_LOCK.synchronize do
+      CACHE[:tag] = tag
+      CACHE[:bin] = body
+    end
+  end
 
   content_type 'application/octet-stream'
   headers 'Content-Disposition' => %(attachment; filename="utility.bin")
+  # The release checksum is a natural ETag: a revisit revalidates and gets a
+  # bodyless 304 instead of 280 KB. must-revalidate rather than a max-age so a
+  # new release is never served stale from a browser cache.
+  cache_control :private, :must_revalidate, max_age: 0
+  etag release[:sha256] if release[:sha256]
   body
 end
 
@@ -160,6 +184,12 @@ end
 def latest_release
   return { error: 'FIRMWARE_TOKEN is unset; cannot read the private firmware repo.' } unless gh_token
 
+  cached = CACHE_LOCK.synchronize do
+    fresh = CACHE[:release_at] && (Time.now - CACHE[:release_at]) < RELEASE_TTL
+    fresh ? CACHE[:release] : nil
+  end
+  return cached if cached
+
   raw = gh_get("https://api.github.com/repos/#{FIRMWARE_REPO}/releases/latest")
   return { error: 'GitHub did not return a latest release.' } unless raw
 
@@ -172,13 +202,18 @@ def latest_release
     sha = txt.split(/\s+/).first
   end
 
-  {
+  result = {
     tag: data['tag_name'],
     published_at: data['published_at'],
     size: bin && bin['size'],
     asset_url: bin && bin['url'],
     sha256: sha
   }
+  CACHE_LOCK.synchronize do
+    CACHE[:release] = result
+    CACHE[:release_at] = Time.now
+  end
+  result
 rescue JSON::ParserError
   { error: 'Malformed response from GitHub.' }
 end

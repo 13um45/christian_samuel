@@ -9,7 +9,7 @@ const DAISY_VENDOR_ID = 0x0483;
 const TRANSFER_SIZE = 1024;
 
 const el = (id) => document.getElementById(id);
-const state = { device: null, firmware: null, release: null };
+const state = { device: null, firmware: null, release: null, prefetch: null };
 
 function setStatus(msg, kind) {
   const node = el('status');
@@ -115,8 +115,12 @@ async function flash() {
   const button = el('flash');
   button.disabled = true;
   try {
-    setStatus('Fetching the latest firmware…');
-    state.firmware = await loadFirmware();
+    // The DFU window is ~2s wide, so nothing slow may sit between the click
+    // and the device picker. The download was started at page load; by now it
+    // is almost always already resolved.
+    if (!state.prefetch) state.prefetch = loadFirmware();
+    setStatus('Preparing…');
+    state.firmware = await state.prefetch;
 
     // The release publishes a checksum; verifying it here means a truncated or
     // proxied-wrong download fails before it reaches the device rather than
@@ -164,6 +168,11 @@ async function init() {
     link.href = state.release.source_url;
     link.textContent = state.release.tag;
     el('release-info').hidden = false;
+
+    state.prefetch = loadFirmware();
+    state.prefetch
+      .then(() => setStatus('Firmware ready. Press RESET on the pedal, then Flash.'))
+      .catch((e) => setStatus('Could not pre-load firmware: ' + e.message, 'error'));
   } catch (err) {
     setStatus('Could not reach the firmware release: ' + err.message, 'error');
   }

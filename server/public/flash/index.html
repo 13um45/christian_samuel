@@ -37,6 +37,14 @@
   button:disabled { opacity: .55; cursor: progress; }
   progress { width: 100%; height: .5rem; margin-top: .9rem; }
   .status { margin-top: .9rem; min-height: 1.5rem; color: var(--muted); font-size: .93rem; }
+  .picker-help {
+    margin-top: 1rem; padding: .9rem 1rem; border-radius: 9px;
+    border: 1px solid var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent);
+    font-size: .9rem;
+  }
+  .picker-help ol { margin: .55rem 0 .55rem; padding-left: 1.2rem; }
+  .picker-help li { margin-bottom: .3rem; }
+  .picker-help p { margin: 0; color: var(--muted); }
   .device { margin-top: .9rem; font-size: .9rem; color: var(--muted); }
   .device::before { content: "\25CF"; margin-right: .45rem; opacity: .5; }
   .device--ok { color: var(--ok); font-weight: 600; }
@@ -74,9 +82,9 @@
         <li>Press <strong>RESET</strong>, then immediately press
             <strong>BOOT</strong>. Do not hold BOOT down during RESET — tap it
             just after. The dot below turns green once the pedal is ready.</li>
-        <li>Press the button below. The first time, it asks you to pick the
-            Daisy device; after that it connects on its own and the button
-            flashes directly.</li>
+        <li>Press <strong>Flash utility</strong>. The first time, the browser
+            asks you to pick the pedal from a list — instructions appear here
+            when it does. After that, Flash goes straight through.</li>
       </ol>
       <p style="margin:.9rem 0 0;font-size:.9rem;color:var(--muted)">
         Why the BOOT tap: after RESET the pedal only listens for about two
@@ -88,7 +96,19 @@
     </div>
 
     <div class="card">
-      <button id="flash">Connect pedal</button>
+      <button id="flash">Flash utility</button>
+      <div class="picker-help" id="picker-help" hidden>
+        <strong>Pick your pedal in the browser's list above.</strong>
+        <ol>
+          <li>It appears as <code>DFU in FS Mode</code>.</li>
+          <li>Nothing listed? The pedal isn't in update mode — press
+              <strong>RESET</strong>, tap <strong>BOOT</strong>, and it will
+              appear in the list.</li>
+          <li>Select it and press <strong>Connect</strong>. Flashing then
+              starts on its own.</li>
+        </ol>
+        <p>You'll only be asked this once — after that, Flash goes straight through.</p>
+      </div>
       <progress id="progress" hidden></progress>
       <div class="device" id="device" hidden></div>
       <div class="status" id="status">Ready.</div>

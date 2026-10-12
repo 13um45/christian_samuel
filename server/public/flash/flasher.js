@@ -175,31 +175,42 @@ async function flash() {
 function refreshButton() {
   const b = el('flash');
   if (!b) return;
-  b.textContent = state.authorised ? 'Flash utility' : 'Connect pedal';
+  b.textContent = 'Flash utility';
 }
 
-async function doConnect() {
+// Chrome's device chooser is browser UI — a page cannot put anything inside
+// it. The next best thing is to raise the instructions in the page, which
+// stays visible below the dialog.
+function showPickerHelp(visible) {
+  const node = el('picker-help');
+  if (node) node.hidden = !visible;
+}
+
+// Pressing Flash always flashes. On a first run it has to pass through the
+// browser's permission prompt to get there, so the help panel goes up while
+// that is on screen and the flash continues straight afterwards.
+async function onPrimary() {
+  if (state.authorised) return flash();
+
   const b = el('flash');
   b.disabled = true;
+  showPickerHelp(true);
+  setStatus('Choose the Daisy device in the browser prompt…');
   try {
-    setStatus('Choose the Daisy device in the browser prompt…');
     const raw = await navigator.usb.requestDevice({ filters: [{ vendorId: DAISY_VENDOR_ID }] });
     state.authorised = !!raw;
     setDeviceState(true);
-    refreshButton();
-    setStatus('Pedal authorised. Press Flash utility when you are ready.', 'ok');
   } catch (err) {
-    // The user dismissing the prompt is a choice, not an error.
     const msg = String(err && err.message ? err.message : err);
-    setStatus(/No device selected/i.test(msg) ? 'No device chosen.' : msg,
-              /No device selected/i.test(msg) ? undefined : 'error');
+    const dismissed = /No device selected/i.test(msg);
+    setStatus(dismissed
+      ? 'No device chosen. Press RESET, tap BOOT, then try again.'
+      : msg, dismissed ? undefined : 'error');
+    return;
   } finally {
+    showPickerHelp(false);
     b.disabled = false;
   }
-}
-
-async function onPrimary() {
-  if (!state.authorised) return doConnect();
   return flash();
 }
 

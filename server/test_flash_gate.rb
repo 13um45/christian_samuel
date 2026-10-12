@@ -59,6 +59,31 @@ check('/flash/flasher.js', REQ.get('/flash/flasher.js', good).status, 200)
 check('/flash/release.json (no token -> 502)', REQ.get('/flash/release.json', good).status, 502)
 check('/flash/firmware.bin (no token -> 502)', REQ.get('/flash/firmware.bin', good).status, 502)
 
+puts 'neighbouring paths are NOT gated (prefix must not over-match):'
+# A bare start_with?('/flash') also catches these, turning an unrelated 404
+# into a 401 and hiding real breakage.
+['/flasher.js', '/flashlight', '/flashy'].each do |p|
+  check("#{p} is not swallowed by the gate", REQ.get(p).status, 404)
+end
+
+puts 'the served page references its assets absolutely:'
+# The page is served at /flash with no trailing slash, so a relative src like
+# "dfu.js" resolves to /dfu.js and 404s — the scripts never load and the page
+# renders blank with no console error. This is the bug that reached production:
+# the old test asked for /flash/flasher.js directly, which is NOT what a
+# browser requests from a page at /flash.
+html = REQ.get('/flash', 'HTTP_AUTHORIZATION' => creds('friend', 'hunter2')).body
+refs = html.scan(/(?:src|href)="([^"]+)"/).flatten
+       .reject { |u| u.start_with?('http://', 'https://', '#', 'data:') }
+bad = refs.reject { |u| u.start_with?('/') }
+check("every local asset ref is absolute (#{refs.length} refs)", bad.empty?, [true])
+puts "      offending: #{bad.inspect}" unless bad.empty?
+
+# ...and each one must actually resolve.
+refs.each do |u|
+  check("#{u} resolves", REQ.get(u, 'HTTP_AUTHORIZATION' => creds('friend', 'hunter2')).status, 200)
+end
+
 puts 'the gate fails closed when unconfigured:'
 saved = ENV.delete('FLASHER_PASSWORD')
 check('/flash with FLASHER_PASSWORD unset', REQ.get('/flash').status, 503)

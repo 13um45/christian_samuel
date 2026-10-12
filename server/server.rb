@@ -27,7 +27,12 @@ class FlashGate
   end
 
   def call(env)
-    return @app.call(env) unless env['PATH_INFO'].to_s.start_with?(@prefix)
+    path = env['PATH_INFO'].to_s
+    # Exact match or a child path only. A bare start_with? would also catch
+    # /flasher.js and /flashlight, turning an unrelated 404 into a 401 and
+    # disguising real breakage as an auth failure.
+    gated = path == @prefix || path.start_with?(@prefix + '/')
+    return @app.call(env) unless gated
 
     user = ENV['FLASHER_USER']
     pass = ENV['FLASHER_PASSWORD']

@@ -87,7 +87,21 @@
   </div>
 
   <div id="app" hidden>
-    <div class="card">
+    <div class="card" id="steps-ready" hidden>
+      <ol>
+        <li>Press <strong>RESET</strong> on the pedal.</li>
+        <li>Press <strong>Flash</strong> below. Flashing starts
+            immediately.</li>
+        <li>Keep the pedal plugged in until it says <strong>Done</strong>,
+            then power-cycle it.</li>
+      </ol>
+      <p style="margin:.9rem 0 0;font-size:.9rem;color:var(--muted)">
+        Press Flash within a couple of seconds of RESET — the pedal only stays
+        in update mode briefly. If you miss it, just reset it again.
+      </p>
+    </div>
+
+    <div class="card" id="steps-connect">
       <ol>
         <li>Plug the pedal into this computer with USB.</li>
         <li>Press <strong>Open connection window</strong> below. A browser

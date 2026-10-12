@@ -9,7 +9,7 @@ const DAISY_VENDOR_ID = 0x0483;
 const TRANSFER_SIZE = 1024;
 
 const el = (id) => document.getElementById(id);
-const state = { device: null, firmware: null, release: null, prefetch: null };
+const state = { device: null, firmware: null, release: null, prefetch: null, devicePresent: false };
 
 function setStatus(msg, kind) {
   const node = el('status');
@@ -61,8 +61,22 @@ async function fixInterfaceNames(rawDevice, interfaces) {
   }
 }
 
-async function connect() {
-  const raw = await navigator.usb.requestDevice({ filters: [{ vendorId: DAISY_VENDOR_ID }] });
+// Devices the user has authorised once on this origin come back without any
+// prompt. requestDevice() is the only call that can show the picker, and the
+// spec requires it to — so it is the fallback, not the default path.
+async function authorisedDaisy() {
+  if (!navigator.usb.getDevices) return null;
+  try {
+    const devices = await navigator.usb.getDevices();
+    return devices.find((d) => d.vendorId === DAISY_VENDOR_ID) || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function connect(preauthorised) {
+  const raw = preauthorised ||
+    await navigator.usb.requestDevice({ filters: [{ vendorId: DAISY_VENDOR_ID }] });
   const interfaces = dfu.findDeviceDfuInterfaces(raw);
   if (interfaces.length === 0) throw new Error('That device exposes no USB DFU interface.');
 
@@ -133,8 +147,9 @@ async function flash() {
       }
     }
 
-    setStatus('Select your device in the browser prompt…');
-    state.device = await connect();
+    const known = await authorisedDaisy();
+    setStatus(known ? 'Connecting…' : 'Select your device in the browser prompt…');
+    state.device = await connect(known);
 
     setStatus('Writing to QSPI 0x' + QSPI_APP_ADDRESS.toString(16) + '…');
     await state.device.do_download(TRANSFER_SIZE, state.firmware, false);
@@ -151,6 +166,29 @@ async function flash() {
   }
 }
 
+// The pedal only sits in DFU briefly, and nothing on screen told the user
+// whether it was there. An authorised device raises connect/disconnect, so the
+// page can simply say so.
+function setDeviceState(present) {
+  state.devicePresent = present;
+  const node = el('device');
+  if (!node) return;
+  node.hidden = false;
+  node.textContent = present ? 'Pedal detected in update mode' : 'Pedal not detected';
+  node.className = 'device' + (present ? ' device--ok' : '');
+}
+
+async function watchForDevice() {
+  if (!navigator.usb.addEventListener) return;
+  setDeviceState(!!(await authorisedDaisy()));
+  navigator.usb.addEventListener('connect', (e) => {
+    if (e.device && e.device.vendorId === DAISY_VENDOR_ID) setDeviceState(true);
+  });
+  navigator.usb.addEventListener('disconnect', (e) => {
+    if (e.device && e.device.vendorId === DAISY_VENDOR_ID) setDeviceState(false);
+  });
+}
+
 async function init() {
   if (!webusbSupported()) {
     el('unsupported').hidden = false;
@@ -159,6 +197,7 @@ async function init() {
   }
   el('app').hidden = false;
   el('flash').addEventListener('click', flash);
+  watchForDevice();
 
   try {
     state.release = await loadRelease();

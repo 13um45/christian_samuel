@@ -232,7 +232,7 @@ async function flash() {
 function refreshButton() {
   const b = el('flash');
   if (!b) return;
-  b.textContent = 'Open connection window';
+  b.textContent = state.authorised && state.devicePresent ? 'Flash' : 'Open connection window';
 }
 
 // Chrome's device chooser is browser UI — a page cannot put anything inside
@@ -278,6 +278,7 @@ function setDeviceState(present) {
   node.hidden = false;
   node.textContent = present ? 'Pedal detected in update mode' : 'Pedal not detected';
   node.className = 'device' + (present ? ' device--ok' : '');
+  refreshButton();
 }
 
 async function watchForDevice() {

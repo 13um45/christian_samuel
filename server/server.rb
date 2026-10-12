@@ -201,6 +201,31 @@ def gh_get_unauthenticated(url, limit: 5)
   res.is_a?(Net::HTTPSuccess) ? res.body : nil
 end
 
+# target_commitish is the BRANCH a release was cut from ("master"), not the
+# commit — linking it would point at a moving ref, which is the whole thing
+# the rolling channel has to avoid. Resolve the tag to its actual commit, and
+# fall back to the SHA the workflow writes into the release body.
+def commit_for(channel, data)
+  return nil unless channel == 'latest'
+
+  raw = gh_get("https://api.github.com/repos/#{FIRMWARE_REPO}/git/ref/tags/#{data['tag_name']}")
+  if raw
+    obj = JSON.parse(raw)['object'] rescue nil
+    if obj
+      # An annotated tag points at a tag object; deref it to reach the commit.
+      if obj['type'] == 'tag'
+        inner = gh_get("https://api.github.com/repos/#{FIRMWARE_REPO}/git/tags/#{obj['sha']}")
+        parsed = (JSON.parse(inner)['object'] rescue nil) if inner
+        return parsed['sha'] if parsed && parsed['sha']
+      end
+      return obj['sha'] if obj['sha']
+    end
+  end
+
+  m = data['body'].to_s.match(/from commit ([0-9a-f]{7,40})/i)
+  m && m[1]
+end
+
 def channel_from(params)
   c = params['channel'].to_s
   CHANNELS.include?(c) ? c : 'stable'
@@ -242,9 +267,7 @@ def latest_release(channel = 'stable')
     asset_url: bin && bin['url'],
     sha256: sha,
     channel: channel,
-    # The rolling tag moves, so it names no source tree. target_commitish is
-    # the commit this build came from and is what the page must link.
-    commit: data['target_commitish']
+    commit: commit_for(channel, data)
   }
   CACHE_LOCK.synchronize do
     slot[:release] = result

@@ -73,9 +73,10 @@
         <li>Plug the pedal into this computer with USB.</li>
         <li>Press <strong>RESET</strong>, then immediately press
             <strong>BOOT</strong>. Do not hold BOOT down during RESET — tap it
-            just after.</li>
-        <li>Press <strong>Flash utility</strong> below and pick the Daisy device
-            in the browser prompt.</li>
+            just after. The dot below turns green once the pedal is ready.</li>
+        <li>Press the button below. The first time, it asks you to pick the
+            Daisy device; after that it connects on its own and the button
+            flashes directly.</li>
       </ol>
       <p style="margin:.9rem 0 0;font-size:.9rem;color:var(--muted)">
         Why the BOOT tap: after RESET the pedal only listens for about two
@@ -87,7 +88,7 @@
     </div>
 
     <div class="card">
-      <button id="flash">Flash utility</button>
+      <button id="flash">Connect pedal</button>
       <progress id="progress" hidden></progress>
       <div class="device" id="device" hidden></div>
       <div class="status" id="status">Ready.</div>

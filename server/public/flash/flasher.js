@@ -9,7 +9,7 @@ const DAISY_VENDOR_ID = 0x0483;
 const TRANSFER_SIZE = 1024;
 
 const el = (id) => document.getElementById(id);
-const state = { device: null, firmware: null, release: null, prefetch: null, devicePresent: false };
+const state = { device: null, firmware: null, release: null, prefetch: null, devicePresent: false, authorised: false };
 
 function setStatus(msg, kind) {
   const node = el('status');
@@ -169,6 +169,40 @@ async function flash() {
 // The pedal only sits in DFU briefly, and nothing on screen told the user
 // whether it was there. An authorised device raises connect/disconnect, so the
 // page can simply say so.
+// The button said "Flash utility" while its actual effect was to open a
+// permission prompt. Label follows behaviour: it only says Flash when
+// pressing it will flash.
+function refreshButton() {
+  const b = el('flash');
+  if (!b) return;
+  b.textContent = state.authorised ? 'Flash utility' : 'Connect pedal';
+}
+
+async function doConnect() {
+  const b = el('flash');
+  b.disabled = true;
+  try {
+    setStatus('Choose the Daisy device in the browser prompt…');
+    const raw = await navigator.usb.requestDevice({ filters: [{ vendorId: DAISY_VENDOR_ID }] });
+    state.authorised = !!raw;
+    setDeviceState(true);
+    refreshButton();
+    setStatus('Pedal authorised. Press Flash utility when you are ready.', 'ok');
+  } catch (err) {
+    // The user dismissing the prompt is a choice, not an error.
+    const msg = String(err && err.message ? err.message : err);
+    setStatus(/No device selected/i.test(msg) ? 'No device chosen.' : msg,
+              /No device selected/i.test(msg) ? undefined : 'error');
+  } finally {
+    b.disabled = false;
+  }
+}
+
+async function onPrimary() {
+  if (!state.authorised) return doConnect();
+  return flash();
+}
+
 function setDeviceState(present) {
   state.devicePresent = present;
   const node = el('device');
@@ -179,10 +213,16 @@ function setDeviceState(present) {
 }
 
 async function watchForDevice() {
+  state.authorised = !!(await authorisedDaisy());
+  refreshButton();
   if (!navigator.usb.addEventListener) return;
-  setDeviceState(!!(await authorisedDaisy()));
+  setDeviceState(state.authorised);
   navigator.usb.addEventListener('connect', (e) => {
-    if (e.device && e.device.vendorId === DAISY_VENDOR_ID) setDeviceState(true);
+    if (e.device && e.device.vendorId === DAISY_VENDOR_ID) {
+      state.authorised = true;
+      setDeviceState(true);
+      refreshButton();
+    }
   });
   navigator.usb.addEventListener('disconnect', (e) => {
     if (e.device && e.device.vendorId === DAISY_VENDOR_ID) setDeviceState(false);
@@ -196,7 +236,7 @@ async function init() {
     return;
   }
   el('app').hidden = false;
-  el('flash').addEventListener('click', flash);
+  el('flash').addEventListener('click', onPrimary);
   watchForDevice();
 
   try {

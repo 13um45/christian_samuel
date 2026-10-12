@@ -79,35 +79,34 @@
     <div class="card">
       <ol>
         <li>Plug the pedal into this computer with USB.</li>
-        <li>Press <strong>RESET</strong>, then immediately press
-            <strong>BOOT</strong>. Do not hold BOOT down during RESET — tap it
-            just after. The dot below turns green once the pedal is ready.</li>
-        <li>Press <strong>Flash utility</strong>. The first time, the browser
-            asks you to pick the pedal from a list — instructions appear here
-            when it does. After that, Flash goes straight through.</li>
+        <li>Press <strong>Open connection window</strong> below. A browser
+            window opens listing USB devices. It will be empty — that is
+            expected.</li>
+        <li><strong>With that window still open</strong>, press
+            <strong>RESET</strong> on the pedal. It appears in the list a
+            moment later.</li>
+        <li>Select it and press <strong>Connect</strong>. Flashing starts
+            immediately.</li>
       </ol>
       <p style="margin:.9rem 0 0;font-size:.9rem;color:var(--muted)">
-        Why the BOOT tap: after RESET the pedal only listens for about two
-        seconds, which is rarely long enough to also pick it from the browser
-        prompt. Tapping BOOT inside that window holds it open indefinitely, so
-        you can take your time. Without it, press RESET again and pick the
-        device quickly.
+        The window must be open <em>before</em> you reset the pedal. Reset it
+        first and it leaves update mode after about two seconds — long gone by
+        the time the window appears.
       </p>
     </div>
 
     <div class="card">
-      <button id="flash">Flash utility</button>
+      <button id="flash">Open connection window</button>
       <div class="picker-help" id="picker-help" hidden>
-        <strong>Pick your pedal in the browser's list above.</strong>
+        <strong>The window is open. Now reset the pedal.</strong>
         <ol>
-          <li>It appears as <code>DFU in FS Mode</code>.</li>
-          <li>Nothing listed? The pedal isn't in update mode — press
-              <strong>RESET</strong>, tap <strong>BOOT</strong>, and it will
-              appear in the list.</li>
-          <li>Select it and press <strong>Connect</strong>. Flashing then
-              starts on its own.</li>
+          <li>Press <strong>RESET</strong> on the pedal.</li>
+          <li>It appears in the list within a second or two.</li>
+          <li>Select it and press <strong>Connect</strong>. Flashing starts
+              immediately.</li>
         </ol>
-        <p>You'll only be asked this once — after that, Flash goes straight through.</p>
+        <p>An empty list just means the pedal isn't in update mode yet. Reset
+           it again — the list updates live, so there's no rush.</p>
       </div>
       <progress id="progress" hidden></progress>
       <div class="device" id="device" hidden></div>

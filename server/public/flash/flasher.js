@@ -175,7 +175,7 @@ async function flash() {
 function refreshButton() {
   const b = el('flash');
   if (!b) return;
-  b.textContent = 'Flash utility';
+  b.textContent = 'Open connection window';
 }
 
 // Chrome's device chooser is browser UI — a page cannot put anything inside
@@ -261,7 +261,7 @@ async function init() {
 
     state.prefetch = loadFirmware();
     state.prefetch
-      .then(() => setStatus('Firmware ready. Press RESET on the pedal, then Flash.'))
+      .then(() => setStatus('Firmware ready. Open the connection window to begin.'))
       .catch((e) => setStatus('Could not pre-load firmware: ' + e.message, 'error'));
   } catch (err) {
     setStatus('Could not reach the firmware release: ' + err.message, 'error');

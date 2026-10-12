@@ -151,7 +151,9 @@ async function selectChannel(channel) {
     if (sub) sub.textContent = state.release.tag;
     state.prefetch = loadFirmware(channel);
     state.prefetch
-      .then(() => setStatus('Firmware ready. Open the connection window to begin.'))
+      .then(() => setStatus(state.authorised
+        ? 'Firmware ready. Press RESET on the pedal, then Flash.'
+        : 'Firmware ready. Open the connection window to begin.'))
       .catch((e) => setStatus('Could not pre-load firmware: ' + e.message, 'error'));
   } catch (err) {
     setStatus('Could not reach the ' + channel + ' release: ' + err.message, 'error');
@@ -232,7 +234,10 @@ async function flash() {
 function refreshButton() {
   const b = el('flash');
   if (!b) return;
-  b.textContent = state.authorised && state.devicePresent ? 'Flash' : 'Open connection window';
+  const ready = state.authorised;
+  b.textContent = ready ? 'Flash' : 'Open connection window';
+  el('steps-ready').hidden = !ready;
+  el('steps-connect').hidden = ready;
 }
 
 // Chrome's device chooser is browser UI — a page cannot put anything inside
